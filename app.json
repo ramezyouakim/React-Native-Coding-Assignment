@@ -1,4 +1,8 @@
 {
   "name": "reactNativeTask",
-  "displayName": "reactNativeTask"
+  "displayName": "reactNativeTask",
+  "packagerOpts": {
+      "projectRoots": "",
+      "config": "rn-cli.config.js"
+    }
 }
