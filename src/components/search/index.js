@@ -47,7 +47,6 @@ export default class SearchComponent extends React.Component {
                             onValueChange={(value) => this.props.onStateChange('priceRange', value)}
                             placeholder={{label:'Price Range',value:null}}
                             value={this.props.priceRange}
-                            style={styles.pickerStyle}
                             items={this.state.priceRanges} />
                     </View>
                     <View style={[styles.InputStyle, styles.searchFiltersInput]}>
@@ -55,7 +54,6 @@ export default class SearchComponent extends React.Component {
                             onValueChange={(value) => this.props.onStateChange('noBr', value)}
                             placeholder={{label:'No. bed',value:null}}
                             value={this.props.noBr}
-                            style={styles.pickerStyle}
                             items={this.state.brRange} />
                     </View>
                     <View style={[styles.InputStyle, styles.searchFiltersInput]}>
@@ -63,7 +61,6 @@ export default class SearchComponent extends React.Component {
                             onValueChange={(value) => this.props.onStateChange('noBh', value)}
                             placeholder={{label:'No. bathroom',value:null}}
                             value={this.props.noBh}
-                            style={styles.pickerStyle}
                             items={this.state.bdRange} />
                     </View>
                 </View>
@@ -73,24 +70,6 @@ export default class SearchComponent extends React.Component {
 }
 /**End of the search Component */
 
-const pickerStyle = {
 
-    placeholderColor: 'black',
-    underline: { borderTopWidth: 0 },
-    icon: {
-        position: 'absolute',
-        backgroundColor: 'transparent',
-        borderTopWidth: 5,
-        borderTopColor: '#00000099',
-        borderRightWidth: 5,
-        borderRightColor: 'transparent',
-        borderLeftWidth: 5,
-        borderLeftColor: 'transparent',
-        width: 0,
-        height: 0,
-        top: 20,
-        right: 15,
-    },
-};
 
 
