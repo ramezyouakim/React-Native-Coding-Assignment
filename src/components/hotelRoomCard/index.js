@@ -5,7 +5,7 @@ import {
     View,
     ImageBackground,
     Text,
-    Image
+    TouchableOpacity
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -14,41 +14,102 @@ import styles from '../../styles';
 
 /**import color values */
 import Colors from '../../styles/colors'
-import { TouchableOpacity } from 'react-native-gesture-handler';
+
+/**Imports of actions  */
+import { storeData, retrieveData } from '../../actions/storage';
 
 /**Hotel Room Card Component */
 export default class HotelRoomCardComponent extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            bookmarkIconName: 'bookmark-o'
+            bookmarkIconName: 'bookmark-o',
+            loveIconName: 'heart-o'
         }
+    }
+
+    componentDidMount() {
+        this.checkForBookmarkOrFav('bookmark', 'bookmarkIconName', 'bookmark');
+        this.checkForBookmarkOrFav('fav', 'loveIconName', 'heart')
+    }
+
+    /**update the list in the storage */
+     updateList(key, arrayName, iconName, IconValue) {
+        storeData(key, JSON.stringify(arrayName)).then(() => {
+            this.setState({ [iconName]: IconValue })
+        })
+    }
+    /**check if this room is in he bookmark or favorite  */
+    checkForBookmarkOrFav(key, iconName, iconOn) {
+        retrieveData(key).then((value) => {
+            let bookmark = JSON.parse(value);
+            if (bookmark.includes(this.props.roomDetail.postId)) {
+                this.setState({ [iconName]: iconOn })
+            }
+        })
+    }
+    /**event handler for adding or removing at the bookmark or favorite list */
+    addToBookMarkOrFav(key, postId, iconName, IconValueOn, IconValueOff) {
+        retrieveData(key).then((value) => {
+            let arrayName = JSON.parse(value);
+
+            if (!arrayName) {
+                arrayName = []
+                arrayName.push(postId);
+                this.updateList(key, arrayName, iconName, IconValueOn)
+            }
+            else {
+                if (arrayName.includes(postId)) {
+                    arrayName.pop(postId);
+                    this.updateList(key, arrayName, iconName, IconValueOff)
+                }
+                else {
+                    arrayName.push(postId);
+                    this.updateList(key, arrayName, iconName, IconValueOn)
+                }
+            }
+        }).catch((err) => {
+            console.log(err)
+        })
     }
 
     render() {
         return (
-            <View style={styles.cardContainer}>
-                <ImageBackground
-                    source={{ uri: this.props.image }}
-                    style={styles.cardCoverImageSize}
-                    imageStyle={styles.cardCoverImageStyle}>
-                    <View style={styles.bookmarkIconConatiner}>
-                        <TouchableOpacity onPress={() => { this.setState({ bookmarkIconName: 'bookmark' }) }}>
-                            <Icon
-                                name={this.state.bookmarkIconName}
-                                size={30}
-                                color={Colors.white} />
+            <TouchableOpacity onPress={() => { this.props.nav('HotelRoomDetailsScreen', { roomDetail: this.props.roomDetail }) }}>
+                <View style={styles.cardContainer}>
+                    <ImageBackground
+                        source={{ uri: this.props.roomDetail.imageUrl }}
+                        style={[styles.cardCoverImageSize, styles.shadowBox]}
+                        imageStyle={styles.cardCoverImageStyle}>
+                        <View style={styles.bookmarkIconConatiner}>
+                            <TouchableOpacity onPress={() => { this.addToBookMarkOrFav('bookmark', this.props.roomDetail.postId, 'bookmarkIconName', 'bookmark', 'bookmark-o') }}>
+                                <Icon
+                                    name={this.state.bookmarkIconName}
+                                    size={30}
+                                    color={Colors.white} />
 
-                        </TouchableOpacity>
+                            </TouchableOpacity>
+                        </View>
+                    </ImageBackground>
+                    <View style={[styles.miniDetailsCard, styles.shadowBox]}>
+                        <View style={styles.row}>
+                            <Text style={styles.cityName}>{this.props.roomDetail.cityName}</Text>
+                            <Text style={styles.price}>{this.props.roomDetail.price}</Text>
+                        </View>
+                        <Text style={styles.HotelRoomAddress}>{this.props.roomDetail.address}</Text>
+                        <View style={styles.row}>
+                            <Text style={styles.hotelRoomDetails}>{this.props.roomDetail.nobed} bed   {this.props.roomDetail.noBath} bath</Text>
+                            <TouchableOpacity onPress={() => { this.addToBookMarkOrFav('fav', this.props.roomDetail.postId, 'loveIconName', 'heart', 'heart-o') }}>
+                                <Icon
+                                    name={this.state.loveIconName}
+                                    size={25}
+                                    color={Colors.black} />
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </ImageBackground>
-                <View style={styles.miniDetailsCard}>
-                    <View style={styles.row}>
-                        <Text style={styles.cityName}>{this.props.cityName}</Text>
-                        <Text style={styles.price}>{this.props.price}</Text>
-                    </View>
+
                 </View>
-            </View>
+            </TouchableOpacity>
         );
     };
 }

@@ -2,11 +2,10 @@
 /**React native components imports */
 import React from 'react';
 import {
-  
-  ScrollView,
   StatusBar,
+  FlatList,
   View,
-  Text
+  ActivityIndicator
 } from 'react-native';
 
 /**Import Style Sheet */
@@ -15,6 +14,10 @@ import styles from '../../styles'
 /**Imports of Components */
 import SearchComponent from '../../components/search';
 import HotelRoomCard from '../../components/hotelRoomCard';
+
+/**Imports of actions */
+import makeCall from '../../actions/network/apiCalls'
+
 
 /**HomeScreen Component */
 export default class HomeScreen extends React.Component {
@@ -25,15 +28,9 @@ export default class HomeScreen extends React.Component {
       priceRange: '',
       noBr: '',
       noBh: '',
-      hotelRoomsList:{
-        postId:'1',
-        cityName:'williamsburg',
-        address:'14 Dunham PI #3G',
-        price:'$1,200',
-        nobed:'1',
-        noBath:'1',
-        imageUrl:"https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSncZLxJJPzxlVpXJcytsHhHIlcJh3A2f2UVf2HLkL-adMgGGcT"
-      }
+      loading: true,
+      hotelRoomsList: [],
+      apiEndPiont: "https://jsonstorage.net/api/items/32244f09-e944-44df-b76f-32a49933f993"
     }
   }
 
@@ -41,16 +38,36 @@ export default class HomeScreen extends React.Component {
     this.setState({
       [key]: value
     })
-  
+
   }
 
+  componentWillMount() {
+    this.fetchApi()
+  }
+
+  fetchApi() {
+    makeCall(this.state.apiEndPiont)
+      .then((res) => {
+        this.setState({
+          hotelRoomsList: res,
+          loading: false
+        })
+      }).catch((err) => {
+        console.log(err);
+        this.setState({
+          loading: false
+        })
+      })
+  }
   render() {
+    if (this.state.loading) return <ActivityIndicator style={{ flex: 1 }} size="large" color="#00ff00" />
+
     return (
       <>
         <StatusBar barStyle="dark-content" />
 
-        <ScrollView
-          style={styles.scrollView}>
+        <View
+          style={styles.mainView}>
           <SearchComponent
             searchQuery={this.state.searchQuery}
             noBh={this.state.noBh}
@@ -58,17 +75,18 @@ export default class HomeScreen extends React.Component {
             priceRange={this.state.priceRange}
             onStateChange={this.onFilterSearchStateItemChange.bind(this)}
           />
-          <HotelRoomCard
-              postId={this.state.hotelRoomsList.postId}
-              cityName={this.state.hotelRoomsList.cityName}
-              address={this.state.hotelRoomsList.address}
-              price={this.state.hotelRoomsList.price}
-              nobed={this.state.hotelRoomsList.nobed}
-              noBath={this.state.hotelRoomsList.noBath}
-              image={this.state.hotelRoomsList.imageUrl}
+          <FlatList
+            data={this.state.hotelRoomsList}
+            renderItem={({ item }) => (
+              //we can pass each prop individual but we will need the other info to pass it down to the details screen so i gonna  pass the whole obj  to avoid passing the whole obj and the individual prop so that will be sending it twice
+              <HotelRoomCard
+                roomDetail={item}
+                nav={this.props.navigation.navigate}
+              />
+            )}
+            keyExtractor={item => item.postId}
           />
-         
-        </ScrollView>
+        </View>
 
       </>
     );
