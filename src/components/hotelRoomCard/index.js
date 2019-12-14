@@ -18,6 +18,7 @@ import Colors from '../../styles/colors'
 /**Imports of actions  */
 import { storeData, retrieveData } from '../../actions/storage';
 
+
 /**Hotel Room Card Component */
 export default class HotelRoomCardComponent extends React.Component {
     constructor(props) {
@@ -29,21 +30,20 @@ export default class HotelRoomCardComponent extends React.Component {
     }
 
     componentDidMount() {
-        this.checkForBookmarkOrFav('bookmark', 'bookmarkIconName', 'bookmark');
-        this.checkForBookmarkOrFav('fav', 'loveIconName', 'heart')
+        this.checkState();
     }
 
-    /**update the list in the storage */
-     updateList(key, arrayName, iconName, IconValue) {
-        storeData(key, JSON.stringify(arrayName)).then(() => {
-            this.setState({ [iconName]: IconValue })
-        })
+    checkState() {
+        this.checkForBookmarkOrFav('bookmark', 'bookmarkIconName', 'bookmark', this.props.roomDetail.postId);
+        this.checkForBookmarkOrFav('fav', 'loveIconName', 'heart', this.props.roomDetail.postId)
     }
+
     /**check if this room is in he bookmark or favorite  */
-    checkForBookmarkOrFav(key, iconName, iconOn) {
+    checkForBookmarkOrFav(key, iconName, iconOn, postId) {
+
         retrieveData(key).then((value) => {
             let bookmark = JSON.parse(value);
-            if (bookmark.includes(this.props.roomDetail.postId)) {
+            if (bookmark.includes(postId)) {
                 this.setState({ [iconName]: iconOn })
             }
         })
@@ -56,16 +56,16 @@ export default class HotelRoomCardComponent extends React.Component {
             if (!arrayName) {
                 arrayName = []
                 arrayName.push(postId);
-                this.updateList(key, arrayName, iconName, IconValueOn)
+                updateList.call(this, key, arrayName, iconName, IconValueOn)
             }
             else {
                 if (arrayName.includes(postId)) {
                     arrayName.pop(postId);
-                    this.updateList(key, arrayName, iconName, IconValueOff)
+                    updateList.call(this, key, arrayName, iconName, IconValueOff)
                 }
                 else {
                     arrayName.push(postId);
-                    this.updateList(key, arrayName, iconName, IconValueOn)
+                    updateList.call(this, key, arrayName, iconName, IconValueOn)
                 }
             }
         }).catch((err) => {
@@ -114,6 +114,13 @@ export default class HotelRoomCardComponent extends React.Component {
     };
 }
 /**End of the Hotel Room Card Component */
+
+/**update fav or bookmark list in the storage and change icons function */
+function updateList(key, arrayName, iconName, IconValue) {
+    storeData(key, JSON.stringify(arrayName)).then(() => {
+        this.setState({ [iconName]: IconValue })
+    })
+}
 
 
 

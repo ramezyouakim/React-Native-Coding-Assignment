@@ -31,9 +31,9 @@ export default class HotelRoomDetailsScreen extends React.Component {
         }
     }
 
-    componentWillMount(){
-        HotelRoomCardComponent.prototype.checkForBookmarkOrFav('bookmark', 'bookmarkIconName', 'bookmark');
-        HotelRoomCardComponent.prototype.checkForBookmarkOrFav('fav', 'loveIconName', 'heart');
+    componentWillMount() {
+        HotelRoomCardComponent.prototype.checkForBookmarkOrFav.call(this, 'bookmark', 'bookmarkIconName', 'bookmark', this.state.roomDetail.postId);
+        HotelRoomCardComponent.prototype.checkForBookmarkOrFav.call(this, 'fav', 'loveIconName', 'heart', this.state.roomDetail.postId);
     }
 
     renderSwitchDetail(param) {
@@ -63,7 +63,7 @@ export default class HotelRoomDetailsScreen extends React.Component {
                                 size={35}
                                 color={Colors.black} />
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => { this.state.bookmarkIconName == 'bookmark-o' ? this.setState({ bookmarkIconName: 'bookmark' }) : this.setState({ bookmarkIconName: 'bookmark-o' }) }}>
+                        <TouchableOpacity onPress={() => { HotelRoomCardComponent.prototype.addToBookMarkOrFav.call(this, 'bookmark', this.state.roomDetail.postId, 'bookmarkIconName', 'bookmark', 'bookmark-o') }}>
                             <Icon
                                 name={this.state.bookmarkIconName}
                                 size={30}
@@ -72,16 +72,16 @@ export default class HotelRoomDetailsScreen extends React.Component {
                     </View>
                 </ImageBackground>
                 <View style={[styles.miniDetailsCard, styles.shadowBox, { margin: 25 }]}>
-                    <View style={[styles.row,{padding:10}]}>
+                    <View style={[styles.row, { padding: 10 }]}>
                         <Text style={styles.cityName}>{this.state.roomDetail.cityName}</Text>
                         <Text style={styles.price}>{this.state.roomDetail.price}</Text>
                     </View>
 
                     <View style={[styles.row, { marginTop: 20 }]}>
                         <Text style={styles.HotelRoomAddress}>{this.state.roomDetail.address}</Text>
-                        <TouchableOpacity onPress={() => { this.state.loveIconName == 'heart-o' ? this.setState({ loveIconName: 'heart' }) : this.setState({ loveIconName: 'heart-o' }) }}>
+                        <TouchableOpacity onPress={() => { HotelRoomCardComponent.prototype.addToBookMarkOrFav.call(this, 'fav', this.state.roomDetail.postId, 'loveIconName', 'heart', 'heart-o') }}>
                             <Icon
-                                style={{ margin:10 }}
+                                style={{ margin: 10 }}
                                 name={this.state.loveIconName}
                                 size={25}
                                 color={Colors.black} />
@@ -102,7 +102,7 @@ export default class HotelRoomDetailsScreen extends React.Component {
                     />
                 </View>
 
-            </View>
+            </View >
         );
     };
 }
